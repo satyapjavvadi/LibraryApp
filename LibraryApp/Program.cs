@@ -6,29 +6,52 @@ namespace LibraryApp
     {
         static void Main(string[] args)
         {
-            // Create an instance of the account
-            var account1 = new Account()
+            Console.WriteLine("Welcome to the Library");
+            while (true)
             {
-                EmailId = "test1@gmail.com"
-            };
-           
-            Console.WriteLine($"Account Number: {account1.AccountNumber}, Email: {account1.EmailId}, Created Date: {account1.AccountCreated}, Checkedout Books: {account1.CheckedoutBooksCount}");
+                Console.WriteLine("0. Exit");
+                Console.WriteLine("1. Create a new library account");
+                Console.WriteLine("2. Checkout books");
+                Console.WriteLine("3. Checkin books");
+                Console.WriteLine("4. Print all accounts");
 
-            account1.CheckoutBooks(4);
+                var choice = Console.ReadLine();
 
-            Console.WriteLine($"Account Number: {account1.AccountNumber}, Email: {account1.EmailId}, Created Date: {account1.AccountCreated}, Checkedout Books: {account1.CheckedoutBooksCount}");
+                switch (choice)
+                {
+                    case "0":
+                        Console.WriteLine("Thank you for visiting the Library");
+                        return;
 
-            account1.CheckinBooks(2);
+                    case "1":
+                        Console.Write("Email Address:");
+                        var emailAddress = Console.ReadLine();
 
-            Console.WriteLine($"Account Number: {account1.AccountNumber}, Email: {account1.EmailId}, Created Date: {account1.AccountCreated}, Checkedout Books: {account1.CheckedoutBooksCount}");
+                        Console.WriteLine("Account types :");
+                        var accountTypes = Enum.GetNames(typeof(AccountType));
+                        for(var i = 0; i <accountTypes.Length; i++)
+                        {
+                            Console.WriteLine($"{i}.{accountTypes[i]}");
+                        }
 
-            // Create second instance of the account
-            var account2 = new Account()
-            {
-                EmailId = "test2@gmail.com"
-            };
+                        Console.Write("Select an account type:");
+                        var accountType = Convert.ToInt32(Console.ReadLine());
 
-            Console.WriteLine($"Account Number: {account2.AccountNumber}, Email: {account2.EmailId}, Created Date: {account2.AccountCreated}, Checkedout Books: {account2.CheckedoutBooksCount}");
+                        var account = Library.CreateAccount(emailAddress, (AccountType)accountType);
+                        Console.WriteLine("Created a new account");
+                        Console.WriteLine($"Account number: {account.AccountNumber}, Account type: {account.AccountType}, Email : {account.EmailId}, Creted date : {account.AccountCreated}, Checkedout book count: {account.CheckedoutBooksCount}");
+                        break;
+                    case "2":
+                        break;
+                    case "3":
+                        break;
+                    case "4":
+                        break;
+                    default:
+                        break;
+                }
+            }
+             
         }
     }
 }
