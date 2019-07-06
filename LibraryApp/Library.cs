@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace LibraryApp
 {
     static class Library
     {
+        // Creating a list of accounts
+        private static List<Account> accounts = new List<Account>();
         /// <summary>
         /// Creates a new account
         /// </summary>
@@ -26,6 +29,35 @@ namespace LibraryApp
                 account.CheckoutBooks(checkedOutBookCount);
             }
 
+            accounts.Add(account);
+            return account;
+        }
+
+        public static IEnumerable<Account> GetAccountsByEmailAddress(string emailAddress)
+        {
+            return accounts.Where(a => a.EmailId == emailAddress);
+        }
+
+        public static void CheckoutBooks(int accountNumber, int bookCount)
+        {
+            var account = FindAccountByAccountNumber(accountNumber);
+            account.CheckoutBooks(bookCount);
+        }
+
+        public static void CheckinBooks(int accountNumber, int bookCount)
+        {
+            var account = FindAccountByAccountNumber(accountNumber);
+            account.CheckinBooks(bookCount);
+        }
+
+        private static Account FindAccountByAccountNumber(int accountNumber)
+        {
+            var account = accounts.SingleOrDefault(a => a.AccountNumber == accountNumber);
+            if (account == null)
+            {
+                // Throws an Exception
+                return null;
+            }
             return account;
         }
     }
