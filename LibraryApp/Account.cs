@@ -17,8 +17,6 @@ namespace LibraryApp
     }
     class Account
     {
-        private static int lastAccountNumber = 0;
-
         #region Properties 
 
         /// <summary>
@@ -29,7 +27,7 @@ namespace LibraryApp
         /// <summary>
         /// The account number
         /// </summary>
-        public int AccountNumber { get; private set; }
+        public int AccountNumber { get; set; }
 
         /// <summary>
         /// The email id for the account
@@ -39,12 +37,12 @@ namespace LibraryApp
         /// <summary>
         /// The account created time
         /// </summary>
-        public DateTime AccountCreated { get; private set; }
+        public DateTime AccountCreated { get; set; }
 
         /// <summary>
         /// The number of books checked out on this account
         /// </summary>
-        public int CheckedoutBooksCount { get; private set; }
+        public int CheckedoutBooksCount { get; set; }
 
         #endregion
 
@@ -52,7 +50,6 @@ namespace LibraryApp
 
         public Account()
         {
-            AccountNumber = ++lastAccountNumber;
             AccountCreated = DateTime.Now;
             CheckedoutBooksCount = 0;
         }
@@ -69,8 +66,7 @@ namespace LibraryApp
         public int CheckoutBooks(int bookCount)
         {
             CheckedoutBooksCount += bookCount;
-            return CheckedoutBooksCount;
-            
+            return CheckedoutBooksCount;            
         }
 
         /// <summary>
@@ -80,6 +76,10 @@ namespace LibraryApp
         /// <returns>Total checked out book count on the account</returns>
         public int CheckinBooks(int bookCount)
         {
+            if(bookCount > CheckedoutBooksCount)
+            {
+                throw new ArgumentException("You don't have anymore books to return");
+            }
             CheckedoutBooksCount -= bookCount;
             return CheckedoutBooksCount;
         }

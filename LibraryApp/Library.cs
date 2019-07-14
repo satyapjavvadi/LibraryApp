@@ -7,8 +7,7 @@ namespace LibraryApp
 {
     static class Library
     {
-        // Creating a list of accounts
-        private static List<Account> accounts = new List<Account>();
+        private static LibraryContext db = new LibraryContext();
         /// <summary>
         /// Creates a new account
         /// </summary>
@@ -29,34 +28,59 @@ namespace LibraryApp
                 account.CheckoutBooks(checkedOutBookCount);
             }
 
-            accounts.Add(account);
+            db.Accounts.Add(account);
+            db.SaveChanges();
             return account;
         }
 
         public static IEnumerable<Account> GetAccountsByEmailAddress(string emailAddress)
         {
-            return accounts.Where(a => a.EmailId == emailAddress);
+            return db.Accounts.Where(a => a.EmailId == emailAddress);
         }
 
         public static void CheckoutBooks(int accountNumber, int bookCount)
         {
             var account = FindAccountByAccountNumber(accountNumber);
             account.CheckoutBooks(bookCount);
+
+            var activity = new Activity
+            {
+                ActivityDate = DateTime.Now,
+                Description = "Checkout Books",
+                BookCount = bookCount,
+                AccountNumber = accountNumber,
+                ActivityType = ActivityType.Checkout
+            };
+
+            db.Activities.Add(activity);
+            db.SaveChanges();
         }
 
         public static void CheckinBooks(int accountNumber, int bookCount)
         {
             var account = FindAccountByAccountNumber(accountNumber);
             account.CheckinBooks(bookCount);
+
+            var activity = new Activity
+            {
+                ActivityDate = DateTime.Now,
+                Description = "Checkin Books",
+                BookCount = bookCount,
+                AccountNumber = accountNumber,
+                ActivityType = ActivityType.Checkin
+            };
+
+            db.Activities.Add(activity);
+            db.SaveChanges();
         }
 
         private static Account FindAccountByAccountNumber(int accountNumber)
         {
-            var account = accounts.SingleOrDefault(a => a.AccountNumber == accountNumber);
+            var account = db.Accounts.SingleOrDefault(a => a.AccountNumber == accountNumber);
             if (account == null)
             {
-                // Throws an Exception
-                return null;
+                throw new ArgumentException("Invalid account number");
+                
             }
             return account;
         }
