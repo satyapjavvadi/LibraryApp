@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LibraryApp
 {
-    class LibraryContext : DbContext
+    public class LibraryContext : DbContext
     {
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Activity> Activities { get; set; }

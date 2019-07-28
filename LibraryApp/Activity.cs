@@ -4,12 +4,12 @@ using System.Text;
 
 namespace LibraryApp
 {
-    enum ActivityType
+    public enum ActivityType
     {
         Checkout,
         Checkin
     }
-    class Activity
+    public class Activity
     {        
         public int ActivityId { get; set; }
         public DateTime ActivityDate { get; set; }

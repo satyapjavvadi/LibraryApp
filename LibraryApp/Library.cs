@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LibraryApp
 {
-    static class Library
+    public static class Library
     {
         private static LibraryContext db = new LibraryContext();
         /// <summary>
@@ -35,6 +35,10 @@ namespace LibraryApp
 
         public static IEnumerable<Account> GetAccountsByEmailAddress(string emailAddress)
         {
+            if(string.IsNullOrEmpty(emailAddress))
+            {
+                throw new ArgumentNullException("emailAddress","Email Address is required");
+            }
             return db.Accounts.Where(a => a.EmailId == emailAddress);
         }
 
@@ -56,6 +60,12 @@ namespace LibraryApp
             db.SaveChanges();
         }
 
+        /// <summary>
+        /// Check-in books from the Library
+        /// </summary>
+        /// <param name="accountNumber">Account number</param>
+        /// <param name="bookCount">Number of books to be checked in</param>
+        /// <exception cref="ArgumentException"/>
         public static void CheckinBooks(int accountNumber, int bookCount)
         {
             var account = FindAccountByAccountNumber(accountNumber);

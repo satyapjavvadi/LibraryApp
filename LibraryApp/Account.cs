@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LibraryApp
 {
-    enum AccountType
+    public enum AccountType
     {
         //  For regular use
         Standard,
@@ -15,7 +15,7 @@ namespace LibraryApp
         // For companies or non-profits
         Firm
     }
-    class Account
+    public class Account
     {
         #region Properties 
 
@@ -78,7 +78,8 @@ namespace LibraryApp
         {
             if(bookCount > CheckedoutBooksCount)
             {
-                throw new ArgumentException("You don't have anymore books to return");
+                // throw new ArgumentException("You don't have anymore books to return");
+                throw new NSFException();
             }
             CheckedoutBooksCount -= bookCount;
             return CheckedoutBooksCount;
