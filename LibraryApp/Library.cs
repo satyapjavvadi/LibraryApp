@@ -33,6 +33,11 @@ namespace LibraryApp
             return account;
         }
 
+        public static IEnumerable<Activity> GetActivitiesByAccountNumber(int accountNumber)
+        {
+            return db.Activities.Where(t => t.AccountNumber == accountNumber).OrderByDescending(t => t.ActivityDate);
+        }
+
         public static IEnumerable<Account> GetAccountsByEmailAddress(string emailAddress)
         {
             if(string.IsNullOrEmpty(emailAddress))
@@ -84,7 +89,7 @@ namespace LibraryApp
             db.SaveChanges();
         }
 
-        private static Account FindAccountByAccountNumber(int accountNumber)
+        public static Account FindAccountByAccountNumber(int accountNumber)
         {
             var account = db.Accounts.SingleOrDefault(a => a.AccountNumber == accountNumber);
             if (account == null)
@@ -93,6 +98,21 @@ namespace LibraryApp
                 
             }
             return account;
+        }
+
+        public static void EditAccount(Account updatedAccount)
+        {
+            var oldAccount = FindAccountByAccountNumber(updatedAccount.AccountNumber);
+            oldAccount.EmailId = updatedAccount.EmailId;
+            oldAccount.AccountType = updatedAccount.AccountType;
+            db.SaveChanges();
+        }
+
+        public static void DeleteAccount(int accountNumber)
+        {
+            var account = FindAccountByAccountNumber(accountNumber);
+            db.Accounts.Remove(account);
+            db.SaveChanges();
         }
     }
 }

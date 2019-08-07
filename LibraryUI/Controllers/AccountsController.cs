@@ -7,18 +7,13 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryApp;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 
 namespace LibraryUI.Controllers
 {
     [Authorize]
     public class AccountsController : Controller
     {
-        private readonly LibraryContext _context;
-
-        public AccountsController(LibraryContext context)
-        {
-            _context = context;
-        }
 
         // GET: Accounts
         public async Task<IActionResult> Index()
@@ -34,14 +29,70 @@ namespace LibraryUI.Controllers
                 return NotFound();
             }
 
-            var account = await _context.Accounts
-                .FirstOrDefaultAsync(m => m.AccountNumber == id);
+            var account = Library.FindAccountByAccountNumber(id.Value);
             if (account == null)
             {
                 return NotFound();
             }
 
             return View(account);
+        }
+
+        // GET: Accounts/CheckinBooks
+        public IActionResult CheckinBooks(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var account = Library.FindAccountByAccountNumber(id.Value);
+            return View(account);
+        }
+        
+        // POST: Accounts/CheckinBooks
+        [HttpPost]
+        public IActionResult CheckinBooks(IFormCollection data)
+        {
+            var accountNumber = Convert.ToInt32(data["AccountNumber"]);
+            var bookCount = Convert.ToInt32(data["BookCount"]);
+            Library.CheckinBooks(accountNumber, bookCount);
+            return RedirectToAction(nameof(Index));
+
+        }
+
+        // GET: Accounts/CheckoutBooks
+        public IActionResult CheckoutBooks(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var account = Library.FindAccountByAccountNumber(id.Value);
+            return View(account);
+        }
+
+        // POST: Accounts/CheckoutBooks
+        [HttpPost]
+        public IActionResult CheckoutBooks(IFormCollection data)
+        {
+            var accountNumber = Convert.ToInt32(data["AccountNumber"]);
+            var bookCount = Convert.ToInt32(data["BookCount"]);
+            Library.CheckoutBooks(accountNumber, bookCount);
+            return RedirectToAction(nameof(Index));
+
+        }
+
+        // GET: Accounts/Activity
+        public IActionResult Activity(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var activities = Library.GetActivitiesByAccountNumber(id.Value);
+            return View(activities);
         }
 
         // GET: Accounts/Create
@@ -55,12 +106,11 @@ namespace LibraryUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AccountType,AccountNumber,EmailId,AccountCreated,CheckedoutBooksCount")] Account account)
+        public async Task<IActionResult> Create([Bind("AccountType,EmailId,")] Account account)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(account);
-                await _context.SaveChangesAsync();
+                Library.CreateAccount(account.EmailId, account.AccountType);
                 return RedirectToAction(nameof(Index));
             }
             return View(account);
@@ -74,7 +124,7 @@ namespace LibraryUI.Controllers
                 return NotFound();
             }
 
-            var account = await _context.Accounts.FindAsync(id);
+            var account = Library.FindAccountByAccountNumber(id.Value);
             if (account == null)
             {
                 return NotFound();
@@ -87,7 +137,7 @@ namespace LibraryUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AccountType,AccountNumber,EmailId,AccountCreated,CheckedoutBooksCount")] Account account)
+        public async Task<IActionResult> Edit(int id, [Bind("AccountType,AccountNumber,EmailId")] Account account)
         {
             if (id != account.AccountNumber)
             {
@@ -98,8 +148,7 @@ namespace LibraryUI.Controllers
             {
                 try
                 {
-                    _context.Update(account);
-                    await _context.SaveChangesAsync();
+                    Library.EditAccount(account);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -125,8 +174,7 @@ namespace LibraryUI.Controllers
                 return NotFound();
             }
 
-            var account = await _context.Accounts
-                .FirstOrDefaultAsync(m => m.AccountNumber == id);
+            var account = Library.FindAccountByAccountNumber(id.Value);
             if (account == null)
             {
                 return NotFound();
@@ -140,15 +188,13 @@ namespace LibraryUI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var account = await _context.Accounts.FindAsync(id);
-            _context.Accounts.Remove(account);
-            await _context.SaveChangesAsync();
+            Library.DeleteAccount(id);
             return RedirectToAction(nameof(Index));
         }
 
         private bool AccountExists(int id)
         {
-            return _context.Accounts.Any(e => e.AccountNumber == id);
+            return (Library.FindAccountByAccountNumber(id) != null) ? true : false;
         }
     }
 }
